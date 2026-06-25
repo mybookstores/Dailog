@@ -25,7 +25,7 @@
 **直接访问 GitHub Pages：**
 👉 https://mybookstores.github.io/Dailog/
 
-或下载 `日报工具.html` 到本地，双击用浏览器打开即可（无需服务器）。
+或下载 `index.html` 到本地，双击用浏览器打开即可（无需服务器）。
 
 > ⚠️ 注意：`Inter` 字体通过 Google Fonts CDN 加载，完全离线使用时会 fallback 到系统字体，不影响功能。
 
@@ -35,7 +35,7 @@
 
 ```
 .
-├── 日报工具.html          # 主文件（单文件，含 HTML/CSS/JS）
+├── index.html            # 主文件（单文件，含 HTML/CSS/JS）
 ├── README.md              # 本文档
 └── .workbuddy/            # WorkBuddy 项目数据（可忽略）
 ```
