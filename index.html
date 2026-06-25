@@ -401,10 +401,10 @@ body::before {
         <div class="form-col wide">
           <div class="fl">项目</div>
           <select class="sel" id="project-select">
-            <option value="risk-model-context">risk-model-context</option>
-            <option value="riskai">riskai</option>
-            <option value="riskgraph">riskgraph</option>
-            <option value="riskgaia">riskgaia</option>
+            <option value="p1">p1</option>
+            <option value="p2">p2</option>
+            <option value="p3">p3</option>
+            <option value="p4">p4</option>
             <option value="other">其他</option>
           </select>
         </div>
@@ -511,18 +511,7 @@ let reports = (() => { try { return JSON.parse(localStorage.getItem(K))||[]; } c
 
 if (!reports.length) {
   reports = [
-    { date:'2026-06-22', wk:'周一', proj:'risk-model-context',
-      done:['完成路径功能的全部联调和测试，已部署上线','完成下载功能的测试'],
-      todo:['risk-model-context 项目分析'],
-      block:[], idea:['AI Coding 分享文档应该放在哪里？待对齐'], tags:['联调','测试','部署'] },
-    { date:'2026-06-23', wk:'周二', proj:'risk-model-context',
-      done:['risk-model-context：完成部分接口从 SR 切换到 RedTao 需求的开发'],
-      todo:['risk-model-context 需求测试'],
-      block:[], idea:[], tags:['开发'] },
-    { date:'2026-06-24', wk:'周三', proj:'risk-model-context',
-      done:['risk-model-context：完成全部接口从 SR 切换到 RedTao 需求的开发','完成对应接口的自测'],
-      todo:['risk-model-context 需求测试'],
-      block:[], idea:[], tags:['开发','测试'] }
+    
   ];
   localStorage.setItem(K, JSON.stringify(reports));
 }
@@ -598,7 +587,7 @@ function loadData(d) {
   if (d.tags) document.querySelectorAll('#tag-pills .tag').forEach(t=>t.classList.toggle('on',d.tags.includes(t.textContent)));
 }
 function resetForm() {
-  document.getElementById('project-select').value='risk-model-context';
+  document.getElementById('project-select').value='p1';
   fill('done-tasks',[]); fill('todo-tasks',[]); fill('block-tasks',[]); fill('idea-tasks',[]);
   document.querySelectorAll('#tag-pills .tag').forEach(t=>t.classList.remove('on'));
 }
