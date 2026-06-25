@@ -453,7 +453,6 @@ body::before {
 }
 .manage-btn:hover { background: rgba(0,0,0,0.05); color: var(--accent); }
 .fl-wrap { display: flex; align-items: center; }
-.tag-manage-row { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
 
 </style>
 </head>
@@ -515,10 +514,8 @@ body::before {
         </div>
       </div>
 
-      <div class="tag-manage-row">
-        <div class="tags" id="tag-pills"></div>
-        <button class="manage-btn" onclick="openManager('tag')">管理标签</button>
-      </div>
+      <div class="fl-wrap" style="margin-bottom:10px"><span class="fl">标签</span><button class="manage-btn" onclick="openManager('tag')">管理</button></div>
+      <div class="tags" id="tag-pills"></div>
 
       <div class="actions">
         <button class="btn btn-sec" onclick="saveDraft()">
