@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>日报 · Daily Report</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+:root {
+  --bg: #F8F9FC;
+  --card: #FFFFFF;
+  --border: rgba(0,0,0,0.05);
+  --border-hover: rgba(0,0,0,0.1);
+  --text: #0F0F12;
+  --text-2: #5A5A60;
+  --text-3: #A0A0A8;
+  --accent: #4F46E5;
+  --accent-light: rgba(79,70,229,0.06);
+  --accent-medium: rgba(79,70,229,0.12);
+  --green: #059669;
+  --green-light: rgba(5,150,105,0.06);
+  --blue: #2563EB;
+  --blue-light: rgba(37,99,235,0.06);
+  --red: #DC2626;
+  --red-light: rgba(220,38,38,0.05);
+  --purple: #7C3AED;
+  --purple-light: rgba(124,58,237,0.06);
+  --radius: 14px;
+  --radius-sm: 9px;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { background: var(--bg); }
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* ===== Subtle grid background ===== */
+body::before {
+  content: '';
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background-image:
+    radial-gradient(circle at 20% 0%, rgba(79,70,229,0.04) 0%, transparent 50%),
+    radial-gradient(circle at 80% 100%, rgba(124,58,237,0.03) 0%, transparent 50%);
+  pointer-events: none; z-index: 0;
+}
+
+/* ===== Nav ===== */
+.nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(248,249,252,0.78);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid var(--border);
+  padding: 0 40px;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 56px;
+}
+.nav-brand { display: flex; align-items: center; gap: 11px; }
+.nav-logo {
+  width: 30px; height: 30px; border-radius: 9px;
+  background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 14px; font-weight: 800;
+  box-shadow: 0 2px 8px rgba(79,70,229,0.3);
+  position: relative;
+}
+.nav-logo::after {
+  content: ''; position: absolute; inset: -1px; border-radius: 10px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
+  pointer-events: none;
+}
+.nav-title { font-size: 15px; font-weight: 700; letter-spacing: -0.3px; color: var(--text); }
+.nav-tabs { display: flex; gap: 3px; background: rgba(0,0,0,0.03); border-radius: 9px; padding: 3px; }
+.nav-tab {
+  padding: 6px 16px; border: none; border-radius: 7px;
+  font-size: 13px; font-weight: 500; cursor: pointer;
+  background: transparent; color: var(--text-3);
+  transition: all 0.2s var(--ease);
+  font-family: inherit;
+}
+.nav-tab:hover { color: var(--text-2); }
+.nav-tab.on {
+  color: var(--text); background: #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  font-weight: 600;
+}
+.nav-meta { font-size: 12px; color: var(--text-3); font-weight: 500; font-variant-numeric: tabular-nums; }
+
+/* ===== Container ===== */
+.container {
+  position: relative; z-index: 1;
+  max-width: 760px; margin: 0 auto;
+  padding: 44px 40px 120px;
+}
+
+/* ===== Hero ===== */
+.hero { margin-bottom: 44px; }
+.hero-date {
+  font-size: 12px; font-weight: 600; color: var(--accent);
+  letter-spacing: 0.8px; text-transform: uppercase;
+  margin-bottom: 6px;
+  display: flex; align-items: center; gap: 8px;
+}
+.hero-date::before {
+  content: ''; display: inline-block;
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-light);
+}
+.hero-big {
+  font-size: 44px; font-weight: 900; letter-spacing: -2.5px;
+  color: var(--text); line-height: 1.08;
+  margin-bottom: 8px;
+}
+.hero-sub {
+  font-size: 14px; color: var(--text-3); font-weight: 500;
+  display: flex; align-items: center; gap: 16px;
+}
+.hero-sub span {
+  display: flex; align-items: center; gap: 5px;
+}
+.hero-dot { color: var(--text-3); font-size: 10px; }
+.hero-val { color: var(--text); font-weight: 700; }
+
+/* ===== Cards ===== */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.02), 0 1px 2px rgba(0,0,0,0.01);
+  padding: 32px;
+  margin-bottom: 16px;
+  transition: box-shadow 0.3s var(--ease), transform 0.3s var(--ease);
+  position: relative;
+  overflow: hidden;
+}
+.card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(79,70,229,0.08), transparent);
+  opacity: 0; transition: opacity 0.3s;
+}
+.card:hover::before { opacity: 1; }
+.card:hover {
+  box-shadow: 0 8px 24px rgba(0,0,0,0.04), 0 2px 6px rgba(0,0,0,0.02);
+  transform: translateY(-1px);
+}
+.card-head {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 24px;
+}
+.card-title {
+  font-size: 12px; font-weight: 700; letter-spacing: 0.6px;
+  text-transform: uppercase; color: var(--text-3);
+}
+
+/* ===== Top form row ===== */
+.form-top { display: flex; gap: 20px; margin-bottom: 32px; }
+.form-col { flex: 1; }
+.form-col.wide { flex: 2; }
+.fl {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.8px;
+  text-transform: uppercase; color: var(--text-3); margin-bottom: 9px;
+}
+.sel {
+  width: 100%; padding: 10px 14px; border-radius: var(--radius-sm);
+  border: 1px solid var(--border); font-size: 13px; font-family: inherit;
+  color: var(--text); background: var(--bg);
+  cursor: pointer; outline: none; font-weight: 500;
+  transition: border-color 0.18s, box-shadow 0.18s, background 0.18s;
+  -webkit-appearance: none; appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23A0A0A8'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 12px center;
+  padding-right: 30px;
+}
+.sel:hover { border-color: var(--border-hover); background: #fff; }
+.sel:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-light); background: #fff; }
+
+/* ===== Sections ===== */
+.section { margin-bottom: 28px; }
+.section:last-of-type { margin-bottom: 0; }
+.sec-head {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 14px; font-size: 11px; font-weight: 700;
+  letter-spacing: 0.7px; text-transform: uppercase;
+}
+.sec-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.sec-dot.g { background: var(--green); box-shadow: 0 0 0 3px var(--green-light); }
+.sec-dot.b { background: var(--blue); box-shadow: 0 0 0 3px var(--blue-light); }
+.sec-dot.r { background: var(--red); box-shadow: 0 0 0 3px var(--red-light); }
+.sec-dot.p { background: var(--purple); box-shadow: 0 0 0 3px var(--purple-light); }
+
+.task-list { display: flex; flex-direction: column; }
+.task-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(0,0,0,0.025);
+  transition: background 0.12s;
+}
+.task-row:hover { background: rgba(0,0,0,0.008); }
+.task-row:last-child { border-bottom: none; }
+.task-idx {
+  width: 24px; height: 24px; border-radius: 7px;
+  background: var(--bg); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700; color: var(--text-3);
+  flex-shrink: 0; transition: all 0.15s;
+}
+.task-row:hover .task-idx { border-color: var(--border-hover); color: var(--text-2); }
+.task-inp {
+  flex: 1; border: none; background: none; outline: none;
+  font-size: 13.5px; font-family: inherit; color: var(--text);
+  padding: 4px 0; line-height: 1.6;
+  border-bottom: 1.5px solid transparent;
+  transition: border-color 0.18s;
+}
+.task-inp:focus { border-bottom-color: var(--accent); }
+.task-inp::placeholder { color: var(--text-3); font-style: italic; }
+
+/* Tags */
+.tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+.tag {
+  font-size: 11px; padding: 5px 14px; border-radius: 7px;
+  border: 1px solid var(--border); cursor: pointer;
+  color: var(--text-2); background: transparent;
+  transition: all 0.18s var(--ease); font-weight: 500;
+}
+.tag:hover { border-color: var(--border-hover); background: rgba(0,0,0,0.015); }
+.tag.on {
+  background: var(--accent); border-color: var(--accent);
+  color: #fff; font-weight: 600;
+  box-shadow: 0 2px 8px rgba(79,70,229,0.2);
+}
+
+/* Actions */
+.actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 28px; }
+.btn {
+  padding: 9px 22px; border-radius: var(--radius-sm);
+  font-size: 12.5px; font-weight: 600; cursor: pointer;
+  font-family: inherit; transition: all 0.18s var(--ease);
+  border: none; letter-spacing: -0.2px;
+  display: flex; align-items: center; gap: 6px;
+}
+.btn-sec { background: var(--bg); color: var(--text-2); border: 1px solid var(--border); }
+.btn-sec:hover { background: #fff; border-color: var(--border-hover); color: var(--text); }
+.btn-pri { background: var(--accent); color: #fff; }
+.btn-pri:hover { background: #4338CA; box-shadow: 0 4px 14px rgba(79,70,229,0.3); transform: translateY(-1px); }
+.btn-pri:active { transform: translateY(0); box-shadow: 0 2px 6px rgba(79,70,229,0.2); }
+
+/* ===== Stats row ===== */
+.stats {
+  display: grid; grid-template-columns: repeat(4,1fr); gap: 12px;
+  margin-bottom: 32px;
+}
+.stat {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 26px 20px 22px;
+  text-align: center; position: relative; overflow: hidden;
+  transition: box-shadow 0.25s var(--ease), transform 0.25s var(--ease);
+  cursor: default;
+}
+.stat:hover { box-shadow: 0 8px 20px rgba(0,0,0,0.04); transform: translateY(-2px); }
+.stat::before { content:''; position:absolute; top:0; left:0; right:0; height: 3px; border-radius: 14px 14px 0 0; }
+.stat.s-g::before { background: linear-gradient(90deg, var(--green), #34D399); }
+.stat.s-b::before { background: linear-gradient(90deg, var(--blue), #60A5FA); }
+.stat.s-p::before { background: linear-gradient(90deg, var(--purple), #A78BFA); }
+.stat.s-r::before { background: linear-gradient(90deg, var(--red), #F87171); }
+.stat-val { font-size: 38px; font-weight: 900; letter-spacing: -2px; line-height: 1; margin-bottom: 5px; }
+.stat.s-g .stat-val { color: var(--green); }
+.stat.s-b .stat-val { color: var(--blue); }
+.stat.s-p .stat-val { color: var(--purple); }
+.stat.s-r .stat-val { color: var(--red); }
+.stat-lbl { font-size: 10.5px; color: var(--text-3); letter-spacing: 0.5px; text-transform: uppercase; font-weight: 600; }
+
+/* ===== Timeline ===== */
+.tline { display: flex; flex-direction: column; gap: 14px; }
+.tl-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 26px 30px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.015);
+  transition: box-shadow 0.25s var(--ease), transform 0.25s var(--ease);
+}
+.tl-card:hover { box-shadow: 0 8px 20px rgba(0,0,0,0.04); transform: translateY(-1px); }
+.tl-top {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 18px; padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+}
+.tl-date { font-size: 18px; font-weight: 800; letter-spacing: -0.5px; color: var(--text); }
+.tl-wk { font-size: 12px; color: var(--text-3); font-weight: 500; }
+.tl-proj {
+  margin-left: auto; font-size: 11px; font-weight: 600;
+  color: var(--accent); background: var(--accent-light);
+  padding: 4px 12px; border-radius: 6px;
+}
+.tl-tags { display: flex; gap: 4px; }
+.tl-tag { font-size: 10px; padding: 2px 9px; border-radius: 4px; background: var(--bg); color: var(--text-3); }
+
+.tl-sec { margin-bottom: 12px; }
+.tl-sec:last-child { margin-bottom: 0; }
+.tl-sh { font-size: 10px; font-weight: 700; letter-spacing: 0.7px; text-transform: uppercase; margin-bottom: 6px; }
+.tl-sh.g { color: var(--green); }
+.tl-sh.b { color: var(--blue); }
+.tl-sh.r { color: var(--red); }
+.tl-sh.p { color: var(--purple); }
+.tl-items { font-size: 13px; color: var(--text-2); padding-left: 16px; line-height: 1.9; }
+.tl-items li::marker { color: var(--text-3); font-size: 9px; }
+.tl-none { font-size: 12px; color: var(--text-3); font-style: italic; list-style: none; padding-left: 0; }
+
+/* ===== Week grid ===== */
+.week-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 8px; }
+.day-cell {
+  padding: 18px 6px 16px; border-radius: var(--radius-sm);
+  border: 1px solid var(--border); text-align: center;
+  font-size: 12px; transition: all 0.2s var(--ease);
+  background: var(--card); cursor: pointer; position: relative;
+}
+.day-cell:hover { border-color: var(--border-hover); transform: translateY(-1px); }
+.day-cell.fill { background: var(--accent-light); border-color: var(--accent-medium); }
+.day-cell.today { border-color: var(--accent); border-width: 1.5px; background: #fff; box-shadow: 0 0 0 3px var(--accent-light); }
+.dc-num { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; color: var(--text); }
+.dc-lbl { font-size: 10px; color: var(--text-3); margin-top: 2px; }
+.dc-sub { font-size: 10px; color: var(--accent); margin-top: 5px; font-weight: 700; }
+.day-cell.empty .dc-sub { color: var(--text-3); }
+
+/* Chart */
+.chart-wrap { margin-top: 12px; }
+
+/* ===== Export ===== */
+.preview {
+  background: #0F0F12; border-radius: var(--radius-sm);
+  padding: 24px; font-size: 12.5px;
+  font-family: 'SF Mono', 'Fira Code', 'Menlo', monospace;
+  white-space: pre-wrap; line-height: 1.9; max-height: 420px; overflow: auto;
+  color: #C7C7CC; margin-top: 16px;
+  border: 1px solid rgba(255,255,255,0.04);
+}
+
+/* Toast */
+.toast {
+  position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%);
+  background: var(--text); color: #fff;
+  padding: 11px 28px; border-radius: 20px;
+  font-size: 12.5px; font-weight: 600; letter-spacing: -0.2px;
+  z-index: 1000; opacity: 0;
+  transition: all 0.35s var(--ease);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+  pointer-events: none;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(-6px); }
+
+/* Panels */
+.panel { display: none; }
+.panel.on { display: block; animation: fadeUp 0.35s var(--ease); }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.08); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.15); }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-brand">
+    <div class="nav-logo">D</div>
+    <span class="nav-title">日报</span>
+  </div>
+  <div class="nav-tabs">
+    <button class="nav-tab on" onclick="go('form')">填写</button>
+    <button class="nav-tab" onclick="go('timeline')">历史</button>
+    <button class="nav-tab" onclick="go('week')">周报</button>
+    <button class="nav-tab" onclick="go('export')">导出</button>
+  </div>
+  <span class="nav-meta" id="nav-meta"></span>
+</nav>
+
+<div class="container">
+
+  <div class="hero" id="hero"></div>
+
+  <!-- ===== Form ===== -->
+  <div id="p-form" class="panel on">
+    <div class="card">
+      <div class="form-top">
+        <div class="form-col wide">
+          <div class="fl">项目</div>
+          <select class="sel" id="project-select">
+            <option value="risk-model-context">risk-model-context</option>
+            <option value="riskai">riskai</option>
+            <option value="riskgraph">riskgraph</option>
+            <option value="riskgaia">riskgaia</option>
+            <option value="other">其他</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="sec-head"><span class="sec-dot g"></span> 今日完成</div>
+        <div class="task-list" id="done-tasks">
+          <div class="task-row"><span class="task-idx">1</span><input class="task-inp" placeholder="完成了什么，结果如何"></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="sec-head"><span class="sec-dot b"></span> 明日计划</div>
+        <div class="task-list" id="todo-tasks">
+          <div class="task-row"><span class="task-idx">1</span><input class="task-inp" placeholder="明天打算做什么"></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="sec-head"><span class="sec-dot r"></span> 风险 / 阻塞</div>
+        <div class="task-list" id="block-tasks">
+          <div class="task-row"><span class="task-idx">1</span><input class="task-inp" placeholder="有什么卡点吗（选填）"></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="sec-head"><span class="sec-dot p"></span> 想法 / 讨论</div>
+        <div class="task-list" id="idea-tasks">
+          <div class="task-row"><span class="task-idx">1</span><input class="task-inp" placeholder="有什么想聊的（选填）"></div>
+        </div>
+      </div>
+
+      <div class="tags" id="tag-pills">
+        <span class="tag" onclick="tg(this)">开发</span>
+        <span class="tag" onclick="tg(this)">测试</span>
+        <span class="tag" onclick="tg(this)">联调</span>
+        <span class="tag" onclick="tg(this)">部署</span>
+        <span class="tag" onclick="tg(this)">文档</span>
+        <span class="tag" onclick="tg(this)">会议</span>
+        <span class="tag" onclick="tg(this)">Code Review</span>
+        <span class="tag" onclick="tg(this)">其他</span>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-sec" onclick="saveDraft()">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 7.5l-4 4-4-4"/><path d="M7 2.5v9"/></svg>
+          保存草稿</button>
+        <button class="btn btn-sec" onclick="preview()">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="1" y="2" width="12" height="10" rx="2"/><path d="M4 6h6M4 9h4"/></svg>
+          预览</button>
+        <button class="btn btn-pri" onclick="submit()">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M2.5 7.5l3 3 6-6"/></svg>
+          提交日报</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Timeline ===== -->
+  <div id="p-timeline" class="panel">
+    <div class="tline" id="timeline-container"></div>
+  </div>
+
+  <!-- ===== Week ===== -->
+  <div id="p-week" class="panel">
+    <div class="stats" id="stats-grid"></div>
+    <div class="card" style="margin-bottom:16px;">
+      <div class="card-head"><span class="card-title">本周概览</span></div>
+      <div class="week-grid" id="week-grid"></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-title">完成趋势</span></div>
+      <div class="chart-wrap">
+        <canvas id="chart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Export ===== -->
+  <div id="p-export" class="panel">
+    <div class="card">
+      <div class="card-head">
+        <span class="card-title">预览 & 导出</span>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-pri" onclick="exportMD()">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6.5 1v7.5M3.5 5.5l3 3 3-3M1 10.5h11"/></svg>
+            导出 .md</button>
+          <button class="btn btn-sec" onclick="copyClip()">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="1" width="8" height="10" rx="1.5"/><path d="M9 1H3.5v10H9"/></svg>
+            复制</button>
+        </div>
+      </div>
+      <div class="preview" id="preview-box">暂无内容</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const K = 'wb_daily_v6', DK = 'wb_draft_v6';
+let reports = (() => { try { return JSON.parse(localStorage.getItem(K))||[]; } catch { return []; } })();
+
+if (!reports.length) {
+  reports = [
+    { date:'2026-06-22', wk:'周一', proj:'risk-model-context',
+      done:['完成路径功能的全部联调和测试，已部署上线','完成下载功能的测试'],
+      todo:['risk-model-context 项目分析'],
+      block:[], idea:['AI Coding 分享文档应该放在哪里？待对齐'], tags:['联调','测试','部署'] },
+    { date:'2026-06-23', wk:'周二', proj:'risk-model-context',
+      done:['risk-model-context：完成部分接口从 SR 切换到 RedTao 需求的开发'],
+      todo:['risk-model-context 需求测试'],
+      block:[], idea:[], tags:['开发'] },
+    { date:'2026-06-24', wk:'周三', proj:'risk-model-context',
+      done:['risk-model-context：完成全部接口从 SR 切换到 RedTao 需求的开发','完成对应接口的自测'],
+      todo:['risk-model-context 需求测试'],
+      block:[], idea:[], tags:['开发','测试'] }
+  ];
+  localStorage.setItem(K, JSON.stringify(reports));
+}
+
+const T  = () => new Date().toISOString().slice(0,10);
+const Y  = () => { const d=new Date(); d.setDate(d.getDate()-1); return d.toISOString().slice(0,10); };
+const WK = s => ['周日','周一','周二','周三','周四','周五','周六'][new Date(s).getDay()];
+const E  = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+/* ===== Nav ===== */
+function go(n) {
+  document.querySelectorAll('.nav-tab').forEach((b,i) => {
+    b.classList.toggle('on', ['form','timeline','week','export'][i]===n);
+  });
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('on'));
+  document.getElementById('p-'+n).classList.add('on');
+  if (n==='timeline') renderTL();
+  if (n==='week') { renderStats(); requestAnimationFrame(() => { requestAnimationFrame(renderChart); }); }
+  if (n==='export') renderExp();
+  if (n==='form') initForm();
+}
+
+/* ===== Hero ===== */
+function refreshHero() {
+  const t = T(), d = new Date(t);
+  const m = ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'][d.getMonth()];
+  const totalDone = reports.reduce((s,r) => s+r.done.length, 0);
+  document.getElementById('hero').innerHTML = `
+    <div class="hero-date">${m} ${d.getDate()}日 · ${WK(t)}</div>
+    <div class="hero-big">${getStreak()} 天连续记录</div>
+    <div class="hero-sub">
+      <span><span class="hero-val">${reports.length}</span> 篇日报</span>
+      <span class="hero-dot">·</span>
+      <span><span class="hero-val">${totalDone}</span> 项完成</span>
+    </div>
+  `;
+  document.getElementById('nav-meta').textContent = t;
+}
+function getStreak() {
+  let s = 0, d = new Date(T());
+  while (true) {
+    const k = d.toISOString().slice(0,10);
+    if (reports.find(r=>r.date===k)) { s++; d.setDate(d.getDate()-1); }
+    else break;
+  }
+  return s;
+}
+
+/* ===== Form ===== */
+function initForm() {
+  const draft = localStorage.getItem(DK);
+  if (draft) { try { loadData(JSON.parse(draft)); return; } catch{} }
+
+  const tr = reports.find(r=>r.date===T());
+  if (tr) { loadData(tr); return; }
+
+  const yr = reports.find(r=>r.date===Y());
+  if (yr) {
+    document.getElementById('project-select').value = yr.proj;
+    fill('done-tasks', yr.todo||[]);
+    fill('todo-tasks',[]); fill('block-tasks',[]); fill('idea-tasks',[]);
+    if (yr.tags) document.querySelectorAll('#tag-pills .tag').forEach(t=>t.classList.toggle('on',yr.tags.includes(t.textContent)));
+    toast('已从昨日预填');
+    return;
+  }
+  resetForm();
+}
+
+function loadData(d) {
+  document.getElementById('project-select').value = d.proj;
+  fill('done-tasks',d.done||[]); fill('todo-tasks',d.todo||[]);
+  fill('block-tasks',d.block||[]); fill('idea-tasks',d.idea||[]);
+  if (d.tags) document.querySelectorAll('#tag-pills .tag').forEach(t=>t.classList.toggle('on',d.tags.includes(t.textContent)));
+}
+function resetForm() {
+  document.getElementById('project-select').value='risk-model-context';
+  fill('done-tasks',[]); fill('todo-tasks',[]); fill('block-tasks',[]); fill('idea-tasks',[]);
+  document.querySelectorAll('#tag-pills .tag').forEach(t=>t.classList.remove('on'));
+}
+function fill(id, items) {
+  const c = document.getElementById(id); c.innerHTML = '';
+  items.forEach((v,i) => {
+    const r = document.createElement('div'); r.className='task-row';
+    r.innerHTML = `<span class="task-idx">${i+1}</span><input class="task-inp" value="${E(v)}">`;
+    c.appendChild(r);
+  });
+  if (!items.length) {
+    const r = document.createElement('div'); r.className='task-row';
+    r.innerHTML = `<span class="task-idx">1</span><input class="task-inp" placeholder="可选">`;
+    c.appendChild(r);
+  }
+  reindex(id);
+}
+function reindex(id) {
+  document.querySelectorAll(`#${id} .task-row`).forEach((r,i) => r.querySelector('.task-idx').textContent = i+1);
+}
+function coll(id) { return [...document.querySelectorAll(`#${id} .task-inp`)].map(i=>i.value.trim()).filter(v=>v); }
+function ct() { return [...document.querySelectorAll('#tag-pills .tag.on')].map(t=>t.textContent); }
+function tg(el) { el.classList.toggle('on'); }
+
+function saveDraft() {
+  localStorage.setItem(DK, JSON.stringify({
+    proj:document.getElementById('project-select').value,
+    done:coll('done-tasks'), todo:coll('todo-tasks'),
+    block:coll('block-tasks'), idea:coll('idea-tasks'), tags:ct()
+  }));
+  toast('草稿已保存');
+}
+
+function preview() {
+  document.getElementById('preview-box').textContent = mkMD({
+    date:T(), wk:WK(T()),
+    proj:document.getElementById('project-select').value,
+    done:coll('done-tasks'), todo:coll('todo-tasks'),
+    block:coll('block-tasks'), idea:coll('idea-tasks'), tags:ct()
+  });
+  go('export');
+}
+
+function submit() {
+  const d = T();
+  reports = reports.filter(r=>r.date!==d);
+  reports.push({ date:d, wk:WK(d),
+    proj:document.getElementById('project-select').value,
+    done:coll('done-tasks'), todo:coll('todo-tasks'),
+    block:coll('block-tasks'), idea:coll('idea-tasks'), tags:ct()
+  });
+  reports.sort((a,b)=>a.date.localeCompare(b.date));
+  localStorage.setItem(K, JSON.stringify(reports));
+  localStorage.removeItem(DK);
+  refreshHero();
+  resetForm();
+  toast('日报已提交');
+}
+
+/* ===== Timeline ===== */
+function renderTL() {
+  document.getElementById('timeline-container').innerHTML = [...reports].reverse().map(r => `
+    <div class="tl-card">
+      <div class="tl-top">
+        <span class="tl-date">${r.date.slice(5)}</span>
+        <span class="tl-wk">${r.wk}</span>
+        <span class="tl-proj">${E(r.proj)}</span>
+        ${r.tags.length?`<span class="tl-tags">${r.tags.map(t=>`<span class="tl-tag">${t}</span>`).join('')}</span>`:''}
+      </div>
+      <div class="tl-sec"><div class="tl-sh g">今日完成</div><ul class="tl-items">${r.done.map(t=>`<li>${E(t)}</li>`).join('')||'<li class="tl-none">暂无</li>'}</ul></div>
+      <div class="tl-sec"><div class="tl-sh b">明日计划</div><ul class="tl-items">${r.todo.map(t=>`<li>${E(t)}</li>`).join('')||'<li class="tl-none">暂无</li>'}</ul></div>
+      ${r.block.length?`<div class="tl-sec"><div class="tl-sh r">风险/阻塞</div><ul class="tl-items">${r.block.map(t=>`<li>${E(t)}</li>`).join('')}</ul></div>`:''}
+      ${r.idea.length?`<div class="tl-sec"><div class="tl-sh p">想法/讨论</div><ul class="tl-items">${r.idea.map(t=>`<li>${E(t)}</li>`).join('')}</ul></div>`:''}
+    </div>
+  `).join('');
+}
+
+/* ===== Week ===== */
+function renderStats() {
+  const base = new Date('2026-06-22');
+  const end = new Date(base); end.setDate(base.getDate()+6);
+  const [sS,eS] = [base.toISOString().slice(0,10), end.toISOString().slice(0,10)];
+  const w = reports.filter(r=>r.date>=sS&&r.date<=eS);
+  const done=w.reduce((s,r)=>s+r.done.length,0);
+  const ideas=w.filter(r=>r.idea.length>0).length;
+  const blocks=w.filter(r=>r.block.length>0).length;
+  const projs=new Set(w.map(r=>r.proj)).size;
+  document.getElementById('stats-grid').innerHTML = `
+    <div class="stat s-g"><div class="stat-val">${done}</div><div class="stat-lbl">完成任务</div></div>
+    <div class="stat s-b"><div class="stat-val">${projs}</div><div class="stat-lbl">项目</div></div>
+    <div class="stat s-p"><div class="stat-val">${ideas}</div><div class="stat-lbl">想法</div></div>
+    <div class="stat s-r"><div class="stat-val">${blocks}</div><div class="stat-lbl">阻塞</div></div>`;
+
+  const days=[];
+  for(let i=0;i<7;i++){const d=new Date(base);d.setDate(base.getDate()+i);days.push(d.toISOString().slice(0,10));}
+  const today=T();
+  document.getElementById('week-grid').innerHTML = days.map(d=>{
+    const r=reports.find(r=>r.date===d);
+    return `<div class="day-cell ${d===today?'today':''} ${r?'fill':'empty'}">
+      <div class="dc-num">${d.slice(8)}</div><div class="dc-lbl">${WK(d)}</div>
+      <div class="dc-sub">${r?r.done.length+' 项':''}</div>
+    </div>`;
+  }).join('');
+}
+
+let chartInst = null;
+function renderChart() {
+  const c = document.getElementById('chart');
+  const base = new Date('2026-06-22'), days = [];
+  for(let i=0;i<7;i++){const d=new Date(base);d.setDate(base.getDate()+i);days.push(d.toISOString().slice(0,10));}
+  const data = days.map(d=>{const r=reports.find(r=>r.date===d);return r?r.done.length:0;});
+  const labels = days.map(WK);
+  const today = T();
+
+  if (chartInst) chartInst.destroy();
+  chartInst = new Chart(c, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        data,
+        backgroundColor: days.map(d => d===today ? '#4338CA' : 'rgba(79,70,229,0.35)'),
+        hoverBackgroundColor: days.map(d => d===today ? '#4338CA' : 'rgba(79,70,229,0.55)'),
+        borderRadius: 6,
+        borderSkipped: false,
+        barPercentage: 0.6,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#1A1A2E',
+          titleFont: { size: 12, family: 'Inter,sans-serif' },
+          bodyFont: { size: 13, family: 'Inter,sans-serif' },
+          padding: 10,
+          cornerRadius: 8,
+          callbacks: {
+            label: ctx => ` 完成 ${ctx.parsed.y} 项`,
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { display: false },
+          ticks: {
+            color: '#9CA0AB',
+            font: { size: 11, family: 'Inter,sans-serif' },
+          }
+        },
+        y: {
+          beginAtZero: true,
+          grid: {
+            color: 'rgba(0,0,0,0.04)',
+            drawBorder: false,
+          },
+          ticks: {
+            color: '#9CA0AB',
+            font: { size: 10, family: 'Inter,sans-serif' },
+            stepSize: 1,
+            precision: 0,
+          }
+        }
+      }
+    }
+  });
+}
+
+/* ===== Export ===== */
+function renderExp() {
+  document.getElementById('preview-box').textContent = reports.map(mkMD).join('\n\n---\n\n')||'暂无记录';
+}
+function mkMD(r) {
+  let md = `### ${r.date}  ${r.wk}\n\n> 项目：${r.proj}`;
+  md += '\n\n**今日完成**\n'; r.done.forEach(t=>md+=`- ${t}\n`);
+  if (!r.done.length) md+='- (无)\n';
+  md+='\n**明日计划**\n'; r.todo.forEach(t=>md+=`- ${t}\n`);
+  if (!r.todo.length) md+='- (无)\n';
+  if (r.block.length){md+='\n**风险/阻塞**\n';r.block.forEach(t=>md+=`- ${t}\n`);}
+  if (r.idea.length){md+='\n**想法/待讨论**\n';r.idea.forEach(t=>md+=`- ${t}\n`);}
+  return md;
+}
+function exportMD() {
+  const t='# 工作日报\n\n'+reports.map(mkMD).join('\n\n---\n\n');
+  const b=new Blob([t],{type:'text/markdown'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`日报_${T()}.md`;a.click();
+  toast('已导出');
+}
+function copyClip() {
+  navigator.clipboard.writeText(document.getElementById('preview-box').textContent).then(()=>toast('已复制'));
+}
+
+/* ===== Toast ===== */
+function toast(m) {
+  const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+/* Init */
+refreshHero(); initForm();
+
+/* Retina 图表在窗口 resize 时重绘 */
+let chartTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(chartTimer);
+  chartTimer = setTimeout(() => {
+    const weekPanel = document.getElementById('p-week');
+    if (weekPanel && weekPanel.classList.contains('on')) renderChart();
+  }, 200);
+});
+</script>
+</body>
+</html>
