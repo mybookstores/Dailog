@@ -444,15 +444,36 @@ body::before {
 .modal-edit-row .eb-cancel { background: var(--bg); color: var(--text-2); }
 .modal-edit-row .eb-cancel:hover { background: rgba(0,0,0,0.06); }
 
-/* manage btn */
-.manage-btn {
-  background: none; border: none; cursor: pointer;
-  font-size: 11px; color: var(--text-3); font-weight: 500;
-  font-family: inherit; padding: 2px 7px; border-radius: 5px;
-  transition: all 0.15s; margin-left: 4px;
+/* section header with manage btn */
+.sec-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
 }
-.manage-btn:hover { background: rgba(0,0,0,0.05); color: var(--accent); }
-.fl-wrap { display: flex; align-items: center; }
+.sec-header .fl { margin-bottom: 0; }
+.manage-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: none;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  font-size: 11px;
+  color: var(--text-3);
+  font-weight: 500;
+  font-family: inherit;
+  padding: 3px 9px;
+  border-radius: 6px;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.manage-btn:hover {
+  background: rgba(79,70,229,0.06);
+  border-color: rgba(79,70,229,0.25);
+  color: var(--accent);
+}
+.manage-btn svg { flex-shrink: 0; }
 
 </style>
 </head>
@@ -481,7 +502,13 @@ body::before {
     <div class="card">
       <div class="form-top">
         <div class="form-col wide">
-          <div class="fl-wrap"><span class="fl">项目</span><button class="manage-btn" onclick="openManager('project')">管理</button></div>
+          <div class="sec-header">
+            <span class="fl">项目</span>
+            <button class="manage-btn" onclick="openManager('project')">
+              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="6" cy="6" r="2.5"/><path d="M6 1v1.5M6 9.5V11M1 6h1.5M9.5 6H11M2.5 2.5l1 1M8.5 8.5l1 1M2.5 9.5l1-1M8.5 3.5l1-1"/></svg>
+              管理
+            </button>
+          </div>
           <select class="sel" id="project-select"></select>
         </div>
       </div>
@@ -514,7 +541,12 @@ body::before {
         </div>
       </div>
 
-      <div class="fl-wrap" style="margin-bottom:10px"><span class="fl">标签</span><button class="manage-btn" onclick="openManager('tag')">管理</button></div>
+      <div class="sec-header"><span class="fl">标签</span>
+        <button class="manage-btn" onclick="openManager('tag')">
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="6" cy="6" r="2.5"/><path d="M6 1v1.5M6 9.5V11M1 6h1.5M9.5 6H11M2.5 2.5l1 1M8.5 8.5l1 1M2.5 9.5l1-1M8.5 3.5l1-1"/></svg>
+          管理
+        </button>
+      </div>
       <div class="tags" id="tag-pills"></div>
 
       <div class="actions">
