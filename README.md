@@ -36,8 +36,7 @@
 ```
 .
 ├── index.html            # 主文件（单文件，含 HTML/CSS/JS）
-├── README.md              # 本文档
-└── .workbuddy/            # WorkBuddy 项目数据（可忽略）
+└── README.md              # 本文档
 ```
 
 ---
