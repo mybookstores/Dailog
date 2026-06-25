@@ -444,74 +444,17 @@ body::before {
 .modal-edit-row .eb-cancel { background: var(--bg); color: var(--text-2); }
 .modal-edit-row .eb-cancel:hover { background: rgba(0,0,0,0.06); }
 
-/* section header with manage btn */
-.sec-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 10px;
-}
-.sec-header .fl { margin-bottom: 0; }
+/* manage btn */
 .manage-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  background: none;
-  border: 1px solid var(--border);
-  cursor: pointer;
-  font-size: 11px;
-  color: var(--text-3);
-  font-weight: 500;
-  font-family: inherit;
-  padding: 3px 9px;
-  border-radius: 6px;
-  transition: all 0.15s;
-  white-space: nowrap;
+  background: none; border: none; cursor: pointer;
+  font-size: 11px; color: var(--text-3); font-weight: 500;
+  font-family: inherit; padding: 2px 7px; border-radius: 5px;
+  transition: all 0.15s; margin-left: 4px;
 }
-.manage-btn:hover {
-  background: rgba(79,70,229,0.06);
-  border-color: rgba(79,70,229,0.25);
-  color: var(--accent);
-}
-.manage-btn svg { flex-shrink: 0; }
+.manage-btn:hover { background: rgba(0,0,0,0.05); color: var(--accent); }
+.fl-wrap { display: flex; align-items: center; }
+.tag-manage-row { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
 
-
-/* ===== AI Assist ===== */
-.nav-ai-btn {
-  background: none; border: 1px solid var(--border); border-radius: 8px;
-  cursor: pointer; padding: 5px 10px; font-size: 12px; font-weight: 600;
-  color: var(--text-2); font-family: inherit;
-  display: inline-flex; align-items: center; gap: 5px;
-  transition: all 0.15s;
-}
-.nav-ai-btn:hover { background: var(--accent-light); border-color: rgba(79,70,229,0.25); color: var(--accent); }
-.nav-ai-btn .dot { width: 6px; height: 6px; border-radius: 50%; background: #22C55E; display: inline-block; }
-.nav-ai-btn .dot.off { background: var(--text-3); }
-
-.ai-btn {
-  display: inline-flex; align-items: center; gap: 4px;
-  background: none; border: 1px dashed rgba(79,70,229,0.3); border-radius: 6px;
-  cursor: pointer; padding: 4px 10px; font-size: 11px; font-weight: 500;
-  color: var(--accent); font-family: inherit;
-  transition: all 0.15s; margin-top: 8px;
-}
-.ai-btn:hover { background: var(--accent-light); border-style: solid; }
-.ai-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-.ai-btn .spinner {
-  width: 12px; height: 12px; border: 2px solid rgba(79,70,229,0.2);
-  border-top-color: var(--accent); border-radius: 50%;
-  animation: ai-spin 0.7s linear infinite; display: none;
-}
-.ai-btn.loading .spinner { display: inline-block; }
-.ai-btn.loading .btn-text { display: none; }
-@keyframes ai-spin { to { transform: rotate(360deg); } }
-
-.ai-result-box {
-  background: var(--bg); border-radius: 10px; padding: 16px;
-  font-size: 13px; line-height: 1.7; color: var(--text);
-  max-height: 320px; overflow: auto; margin-bottom: 16px;
-  white-space: pre-wrap; word-break: break-word;
-}
 </style>
 </head>
 <body>
@@ -527,12 +470,8 @@ body::before {
     <button class="nav-tab" onclick="go('week')">周报</button>
     <button class="nav-tab" onclick="go('export')">导出</button>
   </div>
-  <button class="nav-ai-btn" id="nav-ai-btn" onclick="openAISettings()">
-      <span class="dot off" id="ai-dot"></span>
-      AI 辅助
-    </button>
-    <span class="nav-meta" id="nav-meta"></span>
-  </nav>
+  <span class="nav-meta" id="nav-meta"></span>
+</nav>
 
 <div class="container">
 
@@ -543,13 +482,7 @@ body::before {
     <div class="card">
       <div class="form-top">
         <div class="form-col wide">
-          <div class="sec-header">
-            <span class="fl">项目</span>
-            <button class="manage-btn" onclick="openManager('project')">
-              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="6" cy="6" r="2.5"/><path d="M6 1v1.5M6 9.5V11M1 6h1.5M9.5 6H11M2.5 2.5l1 1M8.5 8.5l1 1M2.5 9.5l1-1M8.5 3.5l1-1"/></svg>
-              管理
-            </button>
-          </div>
+          <div class="fl-wrap"><span class="fl">项目</span><button class="manage-btn" onclick="openManager('project')">管理</button></div>
           <select class="sel" id="project-select"></select>
         </div>
       </div>
@@ -559,7 +492,6 @@ body::before {
         <div class="task-list" id="done-tasks">
           <div class="task-row"><span class="task-idx">1</span><input class="task-inp" placeholder="完成了什么，结果如何"></div>
         </div>
-        <button class="ai-btn" id="ai-done-btn" onclick="aiPolish('done')"><span class="btn-text">✨ AI 润色</span><span class="spinner"></span></button>
       </div>
 
       <div class="section">
@@ -567,7 +499,6 @@ body::before {
         <div class="task-list" id="todo-tasks">
           <div class="task-row"><span class="task-idx">1</span><input class="task-inp" placeholder="明天打算做什么"></div>
         </div>
-        <button class="ai-btn" id="ai-todo-btn" onclick="aiPolish('todo')"><span class="btn-text">✨ AI 润色</span><span class="spinner"></span></button>
       </div>
 
       <div class="section">
@@ -575,23 +506,19 @@ body::before {
         <div class="task-list" id="block-tasks">
           <div class="task-row"><span class="task-idx">1</span><input class="task-inp" placeholder="有什么卡点吗（选填）"></div>
         </div>
-        <button class="ai-btn" id="ai-block-btn" onclick="aiPolish('block')"><span class="btn-text">✨ AI 润色</span><span class="spinner"></span></button>
       </div>
 
       <div class="section">
         <div class="sec-head"><span class="sec-dot p"></span> 想法 / 讨论</div>
         <div class="task-list" id="idea-tasks">
           <div class="task-row"><span class="task-idx">1</span><input class="task-inp" placeholder="有什么想聊的（选填）"></div>
-          <button class="ai-btn" id="ai-idea-btn" onclick="aiPolish('idea')"><span class="btn-text">✨ AI 润色</span><span class="spinner"></span></button>
+        </div>
       </div>
 
-      <div class="sec-header"><span class="fl">标签</span>
-        <button class="manage-btn" onclick="openManager('tag')">
-          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="6" cy="6" r="2.5"/><path d="M6 1v1.5M6 9.5V11M1 6h1.5M9.5 6H11M2.5 2.5l1 1M8.5 8.5l1 1M2.5 9.5l1-1M8.5 3.5l1-1"/></svg>
-          管理
-        </button>
+      <div class="tag-manage-row">
+        <div class="tags" id="tag-pills"></div>
+        <button class="manage-btn" onclick="openManager('tag')">管理标签</button>
       </div>
-      <div class="tags" id="tag-pills"></div>
 
       <div class="actions">
         <button class="btn btn-sec" onclick="saveDraft()">
@@ -1094,116 +1021,8 @@ function addOption() {
 }
 
 
-
-/* ===== AI Assist ===== */
-const AI_KEY = 'wb_ai_key_v1';
-function getAIKey() { return localStorage.getItem(AI_KEY) || ''; }
-function setAIKey(k) { if (k) localStorage.setItem(AI_KEY, k); else localStorage.removeItem(AI_KEY); }
-function hasAIKey() { return !!getAIKey(); }
-
-function updateAIDot() {
-  let dot = document.getElementById('ai-dot');
-  if (dot) dot.className = 'dot' + (hasAIKey() ? '' : ' off');
-}
-
-function openAISettings() {
-  document.getElementById('ai-key-input').value = getAIKey();
-  document.getElementById('ai-settings-modal').classList.add('on');
-  setTimeout(function() { document.getElementById('ai-key-input').focus(); }, 100);
-}
-function closeAISettings() { document.getElementById('ai-settings-modal').classList.remove('on'); }
-function saveAIKey() {
-  let key = document.getElementById('ai-key-input').value.trim();
-  setAIKey(key);
-  updateAIDot();
-  closeAISettings();
-  toast(key ? 'AI 辅助已启用' : '已清除 API Key');
-}
-
-let aiTargetSection = '';
-function aiPolish(section) {
-  if (!hasAIKey()) { openAISettings(); return; }
-  let items = coll(section + '-tasks');
-  if (!items.length) { toast('请先填写内容'); return; }
-  aiTargetSection = section;
-  let btn = document.getElementById('ai-' + section + '-btn');
-  if (btn) btn.classList.add('loading');
-  let prompt = '你是一个专业的工作日报助手。请将以下工作内容描述进行润色，使其更加专业、简洁、有结果导向。保持中文，每条不超过30字。直接返回润色后的列表，格式为JSON数组，不要加其他解释。\n\n原始内容：\n' + items.map(function(t,i){return (i+1)+'. '+t;}).join('\n');
-  callGemini(prompt).then(function(result) {
-    if (btn) btn.classList.remove('loading');
-    showAIResult(result, section);
-  }).catch(function(err) {
-    if (btn) btn.classList.remove('loading');
-    toast('AI 请求失败：' + err.message);
-  });
-}
-
-async function callGemini(prompt) {
-  let key = getAIKey();
-  let url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + encodeURIComponent(key);
-  let body = JSON.stringify({
-    contents: [{ parts: [{ text: prompt }] }],
-    generationConfig: { temperature: 0.3, maxOutputTokens: 512 }
-  });
-  let resp = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: body
-  });
-  if (!resp.ok) { let t = await resp.text(); throw new Error('API 错误 ' + resp.status); }
-  let data = await resp.json();
-  let text = '';
-  try { text = data.candidates[0].content.parts[0].text || ''; } catch(e) { text = ''; }
-  // Try to parse as JSON array
-  try {
-    let parsed = JSON.parse(text);
-    if (Array.isArray(parsed)) return parsed;
-  } catch(e) {}
-  // Try to extract array from text
-  let match = text.match(/\[[\s\S]*\]/);
-  if (match) {
-    try { return JSON.parse(match[0]); } catch(e) {}
-  }
-  return [text.trim()];
-}
-
-function showAIResult(result, section) {
-  let box = document.getElementById('ai-result-box');
-  let html = '';
-  if (Array.isArray(result)) {
-    html = result.map(function(r, i) { return '<div style="padding:6px 0;border-bottom:1px solid var(--border);">' + (i+1) + '. ' + E(String(r)) + '</div>'; }).join('');
-  } else {
-    html = '<div>' + E(String(result)) + '</div>';
-  }
-  box.innerHTML = html;
-  box.dataset.result = JSON.stringify(result);
-  document.getElementById('ai-result-modal').classList.add('on');
-}
-function closeAIResult() { document.getElementById('ai-result-modal').classList.remove('on'); }
-function applyAIResult() {
-  let box = document.getElementById('ai-result-box');
-  let result;
-  try { result = JSON.parse(box.dataset.result); } catch(e) { return; }
-  let section = aiTargetSection;
-  let container = document.getElementById(section + '-tasks');
-  let inputs = container.querySelectorAll('.task-inp');
-  result.forEach(function(r, i) {
-    if (inputs[i]) inputs[i].value = r;
-  });
-  for (let i = inputs.length; i < result.length; i++) {
-    let r = document.createElement('div'); r.className = 'task-row';
-    r.innerHTML = '<span class="task-idx">' + (i+1) + '</span><input class="task-inp" value="' + E(String(result[i])) + '">';
-    container.appendChild(r);
-  }
-  reindex(section + '-tasks');
-  closeAIResult();
-  toast('已应用 AI 润色');
-}
-
-
 /* Init */
 refreshHero();
-updateAIDot();
 loadProjects();
 renderTagPills();
 initForm();
@@ -1218,40 +1037,6 @@ window.addEventListener('resize', () => {
   }, 200);
 });
 </script>
-  <!-- ===== AI Settings Modal ===== -->
-  <div class="modal-ask" id="ai-settings-modal" onclick="if(event.target===this)closeAISettings()">
-    <div class="modal" onclick="event.stopPropagation()">
-      <div class="modal-hd">
-        <span>&#9881;&#65039; AI 辅助设置</span>
-        <button onclick="closeAISettings()">&#10005;</button>
-      </div>
-      <div style="font-size:12px;color:var(--text-3);margin-bottom:14px;line-height:1.6;">
-        在 <a href="https://aistudio.google.com/apikey" target="_blank">Google AI Studio</a> 免费获取 Gemini API Key<br>
-        填入后立即生效，Key 仅保存在浏览器本地
-      </div>
-      <input class="ai-key-input" id="ai-key-input" type="password" placeholder="粘贴 Gemini API Key..." style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;margin-bottom:14px;">
-      <div style="display:flex;gap:8px;justify-content:flex-end;">
-        <button class="btn btn-sec" onclick="closeAISettings()">取消</button>
-        <button class="btn btn-pri" onclick="saveAIKey()">保存</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== AI Result Modal ===== -->
-  <div class="modal-ask" id="ai-result-modal" onclick="if(event.target===this)closeAIResult()">
-    <div class="modal" style="width:520px;" onclick="event.stopPropagation()">
-      <div class="modal-hd">
-        <span>&#10024; AI 润色结果</span>
-        <button onclick="closeAIResult()">&#10005;</button>
-      </div>
-      <div class="ai-result-box" id="ai-result-box"></div>
-      <div style="display:flex;gap:8px;justify-content:flex-end;">
-        <button class="btn btn-sec" onclick="closeAIResult()">放弃</button>
-        <button class="btn btn-pri" onclick="applyAIResult()">&#10003; 应用</button>
-      </div>
-    </div>
-  </div>
-
 <div class="modal-mask" id="modal-ask" onclick="if(event.target===this)closeManager()">
   <div class="modal" onclick="event.stopPropagation()">
     <div class="modal-hd">
