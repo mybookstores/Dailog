@@ -1,8 +1,8 @@
-# 日报工具 · Daily Report
+# Dailog · 日报工具
 
 一个精致、零依赖的日常工作日报管理工具，单文件即可运行，数据完全本地存储。
 
-![banner](https://img.shields.io/badge/单文件-HTML5-orange) ![shield](https://img.shields.io/badge/数据-localStorage-blue) ![shield](https://img.shields.io/badge/图表-Chart.js-purple)
+[![Online](https://img.shields.io/badge/在线使用-mybookstores.github.io/Dailog-brightgreen)](https://mybookstores.github.io/Dailog/) ![HTML5](https://img.shields.io/badge/单文件-HTML5-orange) ![localStorage](https://img.shields.io/badge/数据-localStorage-blue) ![Chart.js](https://img.shields.io/badge/图表-Chart.js-purple)
 
 ---
 
@@ -20,16 +20,12 @@
 
 ---
 
-## 🚀 快速开始
+## 🚀 在线使用
 
-**无需安装，直接打开即可使用：**
+**直接访问 GitHub Pages：**
+👉 https://mybookstores.github.io/Dailog/
 
-```bash
-# 方式一：直接双击 日报工具.html 用浏览器打开
-
-# 方式二：本地启动（解决 CDN 字体加载问题）
-npx serve .
-```
+或下载 `日报工具.html` 到本地，双击用浏览器打开即可（无需服务器）。
 
 > ⚠️ 注意：`Inter` 字体通过 Google Fonts CDN 加载，完全离线使用时会 fallback 到系统字体，不影响功能。
 
@@ -82,13 +78,7 @@ npx serve .
 ## 🔧 自定义
 
 ### 修改项目选项
-编辑 HTML 中 `id="project-select"` 的 `<select>` 元素：
-
-```html
-<select class="sel" id="project-select">
-  <option value="your-project">your-project</option>
-</select>
-```
+编辑 HTML 中 `id="project-select"` 的 `<select>` 元素。
 
 ### 修改标签选项
 编辑 `id="tag-pills"` 下的 `<span class="tag">` 元素。
@@ -103,13 +93,16 @@ location.reload()
 
 ---
 
-## 📦 部署到 GitHub Pages
+## 📦 本地开发
 
-1. Fork 或上传本文件到 GitHub 仓库
-2. 在仓库 Settings → Pages 中启用 GitHub Pages
-3. 访问 `https://<username>.github.io/<repo>/日报工具.html`
+```bash
+# 克隆仓库
+git clone https://github.com/mybookstores/Dailog.git
+cd Dailog
 
-> 由于 CDN 依赖，部署后需确保网络可访问 `cdn.jsdelivr.net` 和 `fonts.googleapis.com`。
+# 本地预览（解决 CDN 字体加载问题）
+npx serve .
+```
 
 ---
 
