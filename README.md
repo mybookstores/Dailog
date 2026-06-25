@@ -1,6 +1,6 @@
 # Dailog · 日报工具
 
-一个精致、零依赖的日常工作日报管理工具，单文件即可运行，数据完全本地存储。
+一个简单、零依赖的日常工作日报管理工具，单文件即可运行，数据完全本地存储。
 
 [![Online](https://img.shields.io/badge/在线使用-mybookstores.github.io/Dailog-brightgreen)](https://mybookstores.github.io/Dailog/) ![HTML5](https://img.shields.io/badge/单文件-HTML5-orange) ![localStorage](https://img.shields.io/badge/数据-localStorage-blue) ![Chart.js](https://img.shields.io/badge/图表-Chart.js-purple)
 
@@ -103,16 +103,4 @@ cd Dailog
 npx serve .
 ```
 
----
 
-## 📝 License
-
-MIT License — 自由使用、修改和分发。
-
----
-
-## 🙋 关于
-
-由 [陈静茹](https://github.com/chenjingru) 开发，用于日常工作中高效记录和管理日报。
-
-如有问题或建议，欢迎提 Issue ✨
