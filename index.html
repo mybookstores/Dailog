@@ -452,7 +452,7 @@ body::before {
   transition: all 0.15s; margin-left: 4px;
 }
 .manage-btn:hover { background: rgba(0,0,0,0.05); color: var(--accent); }
-.fl-wrap { display: flex; align-items: center; }
+.fl-wrap { display: flex; align-items: center; justify-content: space-between; }
 .tag-manage-row { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
 
 </style>
@@ -626,7 +626,7 @@ function refreshHero() {
   const totalDone = reports.reduce((s,r) => s+r.done.length, 0);
   document.getElementById('hero').innerHTML = `
     <div class="hero-date">${m} ${d.getDate()}日 · ${WK(t)}</div>
-    <div class="hero-big">${getStreak()} 天连续记录</div>
+    <div class="hero-big">工作日报</div>
     <div class="hero-sub">
       <span><span class="hero-val">${reports.length}</span> 篇日报</span>
       <span class="hero-dot">·</span>
